@@ -9,6 +9,7 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [model, setModel] = useState<ModelType>("helmet");
   const [status, setStatus] = useState("Ready");
+  const [brainResult, setBrainResult] = useState<any>(null);
 
   async function handleGenerate() {
     if (!prompt.trim()) {
@@ -34,8 +35,17 @@ export default function Home() {
       }
 
       const data = await response.json();
-
-      setModel(data.model);
+      setBrainResult(data);
+      if (data.object === "cube") {
+  setModel("cube");
+} else if (
+  data.object === "ball" ||
+  data.object === "sphere"
+) {
+  setModel("sphere");
+} else if (data.object === "helmet") {
+  setModel("helmet");
+}
 
       setStatus(
         `Brain: ${data.entity} (${Math.round(data.confidence * 100)}% confidence)`
@@ -86,6 +96,11 @@ export default function Home() {
         <p className="mt-4 text-sm text-gray-400">
           {status}
         </p>
+        {brainResult && (
+  <pre className="mt-4 w-full max-w-3xl overflow-auto rounded-lg bg-gray-900 p-4 text-left text-sm text-gray-300">
+    {JSON.stringify(brainResult, null, 2)}
+  </pre>
+)}
 
         <div className="mt-6 flex gap-3">
           <button
